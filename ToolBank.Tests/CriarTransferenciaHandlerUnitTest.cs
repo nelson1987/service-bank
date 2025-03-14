@@ -57,6 +57,7 @@ public class Result<T>
 
     public T Value { get; }
 
+    public static Result<T> Ok<T>() => new(true, Error.None);
     public static Result<T> Ok() => new(true, Error.None);
     public static Result<T> Ok(T value) => new(true, value);
     public static Result<T> Fail(Error error) => new(false, error);

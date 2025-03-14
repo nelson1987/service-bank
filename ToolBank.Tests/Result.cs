@@ -1,3 +1,9 @@
+using System.Collections.Immutable;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Order;
+using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Running;
 using FluentAssertions;
 
 namespace ToolBank.Tests.ResultTests;
@@ -15,6 +21,9 @@ public static class FollowerErrors
 
     public static Error NotFound(Guid id) => new Error(
         "Followers.NotFound", $"The follower with Id '{id}' was not found");
+
+    public static readonly Error RequiredName = new Error(
+        "Name", "Name is required");
 }
 
 public sealed record Error(string Code, string Description)
@@ -41,7 +50,8 @@ public abstract class ResultBase : IResultBase
     }
 }
 
-public abstract class ResultBase<TResult> : ResultBase where TResult : ResultBase<TResult>
+public abstract class ResultBase<TResult> : ResultBase 
+    where TResult : ResultBase<TResult>
 {
     public ResultBase()
     {
@@ -50,6 +60,27 @@ public abstract class ResultBase<TResult> : ResultBase where TResult : ResultBas
 
 public interface IResult<out TResult> : IResultBase
 {
+}
+
+public class Result<TValue> : ResultBase<Result<TValue>>, IResult<TValue>
+{
+    public Result(bool isSuccess)
+    {
+        IsSuccess = isSuccess;
+    }
+
+    public Result(bool isSuccess, TValue value) : this(isSuccess)
+    {
+        IsSuccess = isSuccess;
+        Value = value;
+    }
+
+    public Result(Error error) : this(false)
+    {
+        Errors.Add(error);
+    }
+
+    public TValue Value { get; set; }
 }
 
 public partial class Result : ResultBase<Result>
@@ -70,28 +101,14 @@ public partial class Result : ResultBase<Result>
     }
 }
 
-public class Result<TValue> : ResultBase<Result<TValue>>, IResult<TValue>
-{
-    public Result(bool isSuccess)
-    {
-        IsSuccess = isSuccess;
-    }
-
-    public Result(bool isSuccess, TValue value) : this(isSuccess)
-    {
-        IsSuccess = isSuccess;
-        Value = value;
-    }
-
-    public TValue Value { get; set; }
-}
-
 public partial class Result
 {
     public static Result Ok() => new Result(true);
     public static Result<TValue> Ok<TValue>(TValue value) => new Result<TValue>(true, value);
     public static Result Fail() => new Result(false);
+    public static Result<TValue> Fail<TValue>() => new Result<TValue>(false);
     public static Result Fail(Error error) => new Result(error);
+    public static Result<TValue> Fail<TValue>(Error error) => new Result<TValue>(error);
     public static Result Fail(List<Error> errors) => new Result(errors);
     public static Result<TValue> Fail<TValue>(TValue value) => new Result<TValue>(false, value);
 }
@@ -215,11 +232,45 @@ public record CreateUserResponse(string Name);
 
 public record CreateUserCommand(string Name);
 
-public class CreateUserHandler
+public interface IBaseHandler<TCommand, TResponse>
 {
-    public Result<CreateUserResponse> Handle(CreateUserCommand command)
+    Result<TResponse> Handle(TCommand command);
+    Result<TResponse> Success(TResponse response);
+    Result<TResponse> Failure(TResponse response);
+}
+
+public abstract class BaseHandler<TCommand, TResponse> : IBaseHandler<TCommand, TResponse>
+{
+    public abstract Result<TResponse> Handle(TCommand command);
+
+    public Result<TResponse> Success(TResponse response)
     {
-        return Result.Ok(new CreateUserResponse(command.Name));
+        return Result.Ok(response);
+    }
+
+    public Result<TResponse> Failure(TResponse response)
+    {
+        return Result.Fail(response);
+    }
+
+    protected Result<TResponse> Failure(Error response)
+    {
+        return Result.Fail<TResponse>(response);
+    }
+
+    protected Result<TResponse> Failure()
+    {
+        return Result.Fail<TResponse>();
+    }
+}
+
+public class CreateUserHandler : BaseHandler<CreateUserCommand, CreateUserResponse>
+{
+    public override Result<CreateUserResponse> Handle(CreateUserCommand command)
+    {
+        if (string.IsNullOrEmpty(command.Name))
+            return Failure(FollowerErrors.RequiredName);
+        return Success(new CreateUserResponse(command.Name));
     }
 }
 
@@ -243,5 +294,119 @@ public class CreateUserHandlerUnitTests
         handle.Errors.Should().BeEmpty();
         handle.Value.Should().BeOfType<CreateUserResponse>();
         handle.Value.Name.Should().Be("Nome");
+    }
+
+    [Fact]
+    public void CreateUserHandle_WithFailure()
+    {
+        var command = new CreateUserCommand(string.Empty);
+        var handle = _handler.Handle(command);
+        handle.Should().BeOfType<Result<CreateUserResponse>>();
+        handle.IsSuccess.Should().BeFalse();
+        handle.IsFailed.Should().BeTrue();
+        handle.Errors.Should().NotBeEmpty();
+        handle.Errors.Should().BeOfType<List<Error>>();
+        handle.Errors[0].Code.Should().Be("Name");
+        handle.Errors[0].Description.Should().Be("Name is required");
+    }
+}
+
+[MemoryDiagnoser]
+[Orderer(SummaryOrderPolicy.FastestToSlowest)]
+[RankColumn]
+public class StringConcatBenchmarks
+{
+    private const string FirstName = "John";
+    private const string LastName = "Doe";
+
+    [Benchmark]
+    public string StringConcat()
+    {
+        return FirstName + " " + LastName;
+    }
+
+    [Benchmark]
+    public string StringFormat()
+    {
+        return string.Format("{0} {1}", FirstName, LastName);
+    }
+
+    [Benchmark]
+    public string StringInterpolation()
+    {
+        return $"{FirstName} {LastName}";
+    }
+
+    [Benchmark]
+    public string StringConcatWithJoin()
+    {
+        return string.Join(" ", FirstName, LastName);
+    }
+}
+
+public class BenchmarkFixture
+{
+    public Summary BenchmarkSummary { get; }
+
+    public BenchmarkFixture()
+    {
+        var config = new ManualConfig
+        {
+            SummaryStyle = SummaryStyle.Default.WithMaxParameterColumnWidth(100),
+            Orderer = new DefaultOrderer(SummaryOrderPolicy.FastestToSlowest),
+            Options = ConfigOptions.Default
+        };
+        BenchmarkSummary = BenchmarkRunner.Run<StringConcatBenchmarks>(config);
+    }
+}
+
+public class StringConcatBenchmarkLiveTest : IClassFixture<BenchmarkFixture>
+{
+    private readonly ImmutableArray<BenchmarkReport> _benchmarkReports;
+    private readonly BenchmarkReport _stringInterpolationReport;
+
+    public StringConcatBenchmarkLiveTest(BenchmarkFixture benchmarkFixture)
+    {
+        _benchmarkReports = benchmarkFixture.BenchmarkSummary.Reports;
+        _stringInterpolationReport = _benchmarkReports.First(x =>
+            x.BenchmarkCase.Descriptor.DisplayInfo == "StringConcatBenchmarks.StringInterpolation");
+    }
+
+    [Fact]
+    public void WhenBenchmarkTestsAreRun_ThenFourCasesMustBeExecuted()
+    {
+        var benchmarkCases = _benchmarkReports.Length;
+        // Assert
+        benchmarkCases.Should().Be(4);
+    }
+
+    [Fact]
+    public void WhenStringInterpolationCaseIsExecuted_ThenItShouldNotTakeMoreThanFifteenNanoSecs()
+    {
+        var stats = _stringInterpolationReport.ResultStatistics;
+        // Assert
+        (stats is { Mean: < 15 }).Should().BeTrue($"Mean was {stats.Mean}");
+    }
+
+    [Fact]
+    public void WhenStringInterpolationCaseIsExecuted_ThenItShouldNotConsumeMemoryMoreThanMaxAllocation()
+    {
+        const int maxAllocation = 1342178216;
+        var memoryStats = _stringInterpolationReport.GcStats;
+        var stringInterpolationCase = _stringInterpolationReport.BenchmarkCase;
+        var allocation = memoryStats.GetBytesAllocatedPerOperation(stringInterpolationCase);
+        var totalAllocatedBytes = memoryStats.GetTotalAllocatedBytes(true);
+        // Assert
+        (allocation <= maxAllocation).Should().BeTrue($"Allocation was {allocation}");
+        (totalAllocatedBytes <= maxAllocation).Should().BeTrue($"TotalAllocatedBytes was {totalAllocatedBytes}");
+    }
+
+    [Fact]
+    public void WhenStringInterpolationCaseIsExecuted_ThenZeroAllocationInGen1AndGen2()
+    {
+        var memoryStats = _stringInterpolationReport.GcStats;
+        // Assert
+        (memoryStats.Gen1Collections == 0).Should().BeTrue($"Gen1Collections was {memoryStats.Gen1Collections}");
+        (memoryStats.Gen2Collections == 0).Should().BeTrue($"Gen2Collections was {memoryStats.Gen2Collections}");
     }
 }
