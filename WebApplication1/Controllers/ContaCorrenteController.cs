@@ -4,7 +4,7 @@ using ToolBank.Tests.Libs;
 namespace WebApplication1.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class ContaCorrenteController : ControllerBase
 {
     private readonly ILogger<ContaCorrenteController> _logger;
