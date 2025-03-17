@@ -24,7 +24,7 @@ public abstract class BaseHandler<TCommand, TResponse> : IBaseHandler<TCommand, 
     public abstract Task<HandlerResult<TResponse>>
         HandleAsync(TCommand command, CancellationToken cancellationToken = default);
 
-    protected HandlerResult<TResponse> Ok(TResponse response)
+    protected HandlerResult<TResponse> Success(TResponse response)
     {
         return HandlerResult.Success(response);
     }
@@ -93,7 +93,7 @@ public class CreateResultadoHandler : BaseHandler<CreateResultadoCommand, Create
             return Task.FromResult(Failure());
         if (command.Nome.Equals("NotFound"))
             return Task.FromResult(NotFound(Guid.NewGuid()));
-        return Task.FromResult(Ok(new CreateResultadoResponse("Id", "Nome do Usuario")));
+        return Task.FromResult(Success(new CreateResultadoResponse("Id", "Nome do Usuario")));
     }
 }
 

@@ -43,13 +43,37 @@ public interface ICreateContaCorrenteHandler : IBaseHandler<CreateResultadoComma
 public class CreateContaCorrenteHandler : BaseHandler<CreateResultadoCommand, CreateResultadoResponse>,
     ICreateContaCorrenteHandler
 {
-    public override Task<HandlerResult<CreateResultadoResponse>> HandleAsync(CreateResultadoCommand command,
+    private readonly ILogger<CreateContaCorrenteHandler> _logger;
+    private readonly IContaRepository _contaRepository;
+
+    public CreateContaCorrenteHandler(ILogger<CreateContaCorrenteHandler> logger, IContaRepository contaRepository)
+    {
+        _logger = logger;
+        _contaRepository = contaRepository;
+    }
+
+    public override async Task<HandlerResult<CreateResultadoResponse>> HandleAsync(CreateResultadoCommand command,
         CancellationToken cancellationToken = default)
     {
+        _logger.LogInformation("Create CreateResultado | Post | {0}", command);
         if (command.Nome.Equals("Fail"))
-            return Task.FromResult(Failure());
+            return Failure();
+        
+        var conta = await _contaRepository.GetByName(command.Nome);
         if (command.Nome.Equals("NotFound"))
-            return Task.FromResult(NotFound(Guid.NewGuid()));
-        return Task.FromResult(Ok(new CreateResultadoResponse("Id", "Nome do Usuario")));
+            return NotFound(Guid.NewGuid());
+        
+        _logger.LogInformation("Conta corrente criado com sucesso!");
+        return Success(new CreateResultadoResponse("Id", "Nome do Usuario"));
     }
+}
+
+public class ContaCorrente
+{
+    public Guid Id { get; set; }
+}
+
+public interface IContaRepository
+{
+    Task<ContaCorrente>? GetByName(string name);
 }

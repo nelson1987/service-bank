@@ -10,6 +10,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToolBank.Tests", "ToolBank.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication1", "WebApplication1\WebApplication1.csproj", "{6E170AA9-874D-45D4-883F-6DAFF11433CC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Seek", "Seek\Seek.csproj", "{9CCC29AB-696F-46EA-ABC9-7885E13AB521}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JuntaAi", "JuntaAi\JuntaAi.csproj", "{2DF676BC-8943-459E-B16C-FE4E98C0630F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +40,13 @@ Global
 		{6E170AA9-874D-45D4-883F-6DAFF11433CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6E170AA9-874D-45D4-883F-6DAFF11433CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6E170AA9-874D-45D4-883F-6DAFF11433CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CCC29AB-696F-46EA-ABC9-7885E13AB521}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CCC29AB-696F-46EA-ABC9-7885E13AB521}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CCC29AB-696F-46EA-ABC9-7885E13AB521}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CCC29AB-696F-46EA-ABC9-7885E13AB521}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DF676BC-8943-459E-B16C-FE4E98C0630F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DF676BC-8943-459E-B16C-FE4E98C0630F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DF676BC-8943-459E-B16C-FE4E98C0630F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DF676BC-8943-459E-B16C-FE4E98C0630F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
