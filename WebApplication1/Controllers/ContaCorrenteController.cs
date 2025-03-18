@@ -58,13 +58,13 @@ public class CreateContaCorrenteHandler : BaseHandler<CreateResultadoCommand, Cr
         _logger.LogInformation("Create CreateResultado | Post | {0}", command);
         if (command.Nome.Equals("Fail"))
             return Failure();
-        
+
         var conta = await _contaRepository.GetByName(command.Nome);
         if (command.Nome.Equals("NotFound"))
-            return NotFound(Guid.NewGuid());
-        
+            return NotFound(conta.Id);
+
         _logger.LogInformation("Conta corrente criado com sucesso!");
-        return Success(new CreateResultadoResponse("Id", "Nome do Usuario"));
+        return Success(new CreateResultadoResponse(conta.Id.ToString(), "Nome do Usuario"));
     }
 }
 
