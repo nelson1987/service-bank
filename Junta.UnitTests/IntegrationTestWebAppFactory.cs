@@ -32,6 +32,7 @@ public class IntegrationTestWebAppFactory
         {
             _.AddTransient<ICreateProductCommandHandler, CreateProductHandler>();
             _.AddTransient<IProductRepository, ProductRepository>();
+            _.AddTransient<IDbContext, ProductContext>();
             // var descriptorType = typeof(DbContextOptions<ApplicationDbContext>);
             //
             // var descriptor = Enumerable

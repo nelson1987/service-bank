@@ -38,3 +38,14 @@ public class Result
         return new Result<T>(default, false, error);
     }
 }
+
+public class Result<T> : Result
+{
+    protected internal Result(T value, bool isSuccess, string error)
+        : base(isSuccess, error)
+    {
+        Value = value;
+    }
+
+    public T Value { get; }
+}

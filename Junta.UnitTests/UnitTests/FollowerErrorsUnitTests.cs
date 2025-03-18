@@ -13,6 +13,7 @@ public class FollowerErrorsUnitTests : UnitTests
         errorFact.Code.Should().Be("Followers.AlreadyFollowing");
         errorFact.Description.Should().Be("Already following");
     }
+    
     [Fact]
     public void Validar_FollowerErrors_NotFound()
     {

@@ -2,17 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Junta.Web.Controllers;
 
-public class Result<T> : Result
-{
-    protected internal Result(T value, bool isSuccess, string error)
-        : base(isSuccess, error)
-    {
-        Value = value;
-    }
-
-    public T Value { get; }
-}
-
 [ApiController]
 [Route("api/[controller]")]
 public class ContaCorrenteController : ControllerBase
