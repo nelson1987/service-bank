@@ -1,4 +1,4 @@
-namespace Junta.Web.Controllers;
+namespace Junta.Domain;
 
 public interface IDbContext
 {

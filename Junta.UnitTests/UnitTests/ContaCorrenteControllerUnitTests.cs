@@ -1,4 +1,5 @@
 using AutoFixture;
+using Junta.Domain;
 using Junta.Web.Controllers;
 using Moq;
 

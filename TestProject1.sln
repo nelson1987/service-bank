@@ -22,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Junta.Web", "Junta.Web\Junt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Junta.UnitTests", "Junta.UnitTests\Junta.UnitTests.csproj", "{26CB9ED5-23A5-4541-BDA0-570609442917}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Junta.Domain", "Junta.Domain\Junta.Domain.csproj", "{BB5F880D-6003-4ACF-A482-1381830A534A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -72,5 +74,9 @@ Global
 		{26CB9ED5-23A5-4541-BDA0-570609442917}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{26CB9ED5-23A5-4541-BDA0-570609442917}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{26CB9ED5-23A5-4541-BDA0-570609442917}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB5F880D-6003-4ACF-A482-1381830A534A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB5F880D-6003-4ACF-A482-1381830A534A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB5F880D-6003-4ACF-A482-1381830A534A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB5F880D-6003-4ACF-A482-1381830A534A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

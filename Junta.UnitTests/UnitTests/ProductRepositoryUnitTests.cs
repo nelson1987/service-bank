@@ -1,3 +1,4 @@
+using Junta.Domain;
 using Junta.Web.Controllers;
 
 namespace Junta.UnitTests;

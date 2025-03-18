@@ -1,5 +1,4 @@
-namespace Junta.Web.Controllers;
-
+namespace Junta.Domain;
 public class ProductRepository : IProductRepository
 {
     private readonly IDbContext _context;
@@ -7,6 +6,7 @@ public class ProductRepository : IProductRepository
     public ProductRepository(IDbContext context)
     {
         _context = context;
+        _context.Products = new List<Product>();
     }
 
     public Task<Product> GetByIdAsync(Guid id)

@@ -1,3 +1,4 @@
+using Junta.Domain;
 using Junta.Web.Controllers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -32,7 +33,7 @@ public class IntegrationTestWebAppFactory
         {
             _.AddTransient<ICreateProductCommandHandler, CreateProductHandler>();
             _.AddTransient<IProductRepository, ProductRepository>();
-            _.AddTransient<IDbContext, ProductContext>();
+            _.AddTransient<IDbContext, DbContext>();
             // var descriptorType = typeof(DbContextOptions<ApplicationDbContext>);
             //
             // var descriptor = Enumerable

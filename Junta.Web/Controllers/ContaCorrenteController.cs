@@ -1,3 +1,4 @@
+using Junta.Domain;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Junta.Web.Controllers;
@@ -17,11 +18,19 @@ public class ContaCorrenteController : ControllerBase
     public async Task<IActionResult> Post([FromServices] ICreateProductCommandHandler createProductCommandHandler,
         CreateProductCommand command)
     {
-        var result = await createProductCommandHandler.HandleAsync(command);
-        if (result.IsFailure)
-            return BadRequest(result.Error);
+        try
+        {
+            var result = await createProductCommandHandler.HandleAsync(command);
+            if (result.IsFailure)
+                return BadRequest(result.Error);
 
-        return CreatedAtAction(nameof(GetById), new { id = result.Value.Id }, result.Value);
+            return CreatedAtAction(nameof(GetById), new { id = result.Value.Id }, result.Value);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
     [HttpGet("{id}")]

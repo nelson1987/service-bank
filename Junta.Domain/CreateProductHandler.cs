@@ -1,4 +1,4 @@
-namespace Junta.Web.Controllers;
+namespace Junta.Domain;
 
 public class CreateProductHandler : ICreateProductCommandHandler
 {
@@ -13,7 +13,7 @@ public class CreateProductHandler : ICreateProductCommandHandler
     {
         try
         {
-            var product = new Product(command.Name, command.Description, command.Price, command.Stock);
+            Product product = command.MapToEntity();
             await _productRepository.AddAsync(product);
             return Result.Success(product.MapToResponse());
         }
@@ -23,7 +23,7 @@ public class CreateProductHandler : ICreateProductCommandHandler
         }
         catch (Exception ex)
         {
-            return Result.Failure<CreateProductResponse>($"Erro ao criar produto: {ex.Message}");
+            return Result.Failure<CreateProductResponse>(FollowerErrors.CreateProduct(ex).Description);
         }
     }
 }

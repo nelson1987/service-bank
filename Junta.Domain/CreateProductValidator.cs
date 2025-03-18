@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace Junta.Web.Controllers;
+namespace Junta.Domain;
 
 public class CreateProductValidator : AbstractValidator<CreateProductCommand>
 {

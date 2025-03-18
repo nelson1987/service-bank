@@ -26,6 +26,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Junta.Web\Junta.Web.csproj"/>
+        <ProjectReference Include="..\Junta.Domain\Junta.Domain.csproj"/>
     </ItemGroup>
 
 </Project>
