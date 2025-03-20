@@ -1,31 +1,42 @@
 name: Run Tests 🚀
 on:
-  workflow_dispatch:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
-  run-tests:
-    runs-on: ubuntu-latest
+  build:
+    strategy:
+      matrix:
+        configuration: [Debug, Release]
+
+    runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v3
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 8.0.x
+    # Install the .NET Core workload
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    
+    - name: Setup MSBuild.exe
+      uses: microsoft/setup-msbuild@v2
 
-      - name: Restore
-        run: dotnet restore ./Products.Api.sln
+    - name: Restore
+      run: dotnet restore ./Products.Api.sln
 
-      - name: Build
-        run: dotnet build ./Products.Api.sln --no-restore
+    - name: Build
+      run: dotnet build ./Products.Api.sln --no-restore
 
-      - name: Test
-        run: dotnet test ./Products.Api.sln --no-build
-        uses: actions/upload-artifact@v4
-        with:
-          name: MSIX Package
-          path: ${{ env.Wap_Project_Directory }}\AppPackages
+    - name: Test
+      run: dotnet test ./Products.Api.sln --no-build
+      uses: actions/upload-artifact@v4
+      with:
+        name: MSIX Package
+        path: ${{ env.Wap_Project_Directory }}\AppPackages
