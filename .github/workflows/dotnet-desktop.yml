@@ -25,7 +25,7 @@ jobs:
 
       - name: Test
         run: dotnet test ./Products.Api.sln --no-build
-      uses: actions/upload-artifact@v4
-      with:
-        name: MSIX Package
-        path: ${{ env.Wap_Project_Directory }}\AppPackages
+        uses: actions/upload-artifact@v4
+        with:
+          name: MSIX Package
+          path: ${{ env.Wap_Project_Directory }}\AppPackages
