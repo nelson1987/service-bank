@@ -1,9 +1,10 @@
+using DotNet.Testcontainers.Builders;
 using Junta.Domain;
-using Junta.Web.Controllers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using Testcontainers.MsSql;
 
 namespace Junta.UnitTests;
 
@@ -11,21 +12,22 @@ public class IntegrationTestWebAppFactory
     : WebApplicationFactory<Program>,
         IAsyncLifetime
 {
+    private readonly MsSqlContainer _dbContainer = new MsSqlBuilder()
+        .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
+        .WithPassword("1q2w3e4r@#$!")
+        .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(1433))
+        .Build();
+
     public Task InitializeAsync()
     {
-        throw new NotImplementedException();
+        return _dbContainer.StartAsync();
     }
 
     public Task DisposeAsync()
     {
-        throw new NotImplementedException();
+        return _dbContainer.StopAsync();
     }
 
-    // private readonly MsSqlContainer _dbContainer = new MsSqlBuilder()
-    //     .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
-    //     .WithPassword("1q2w3e4r@#$!")
-    //     .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(1433))
-    //     .Build();
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");
